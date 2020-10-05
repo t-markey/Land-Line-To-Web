@@ -5,6 +5,8 @@ import wikipedia as wk
 from authentication_twil import account_sid, auth_token, from_
 from twilio.rest import Client
 import random
+import weathertest
+import pizzatest
 
 
 app = Flask(__name__)
@@ -43,13 +45,10 @@ def gather():
             resp.redirect('/infoing')
         elif choice == '2':
             resp.say('You requested a Weather forcast.')
-            return str(resp)
+            resp.redirect('/weathering')
         elif choice == '3':
             resp.say('You must be hungry.')
             resp.redirect('/pizza')
-        # elif choice == '3':
-        #     resp.say('You are hungry.')
-        #     return str(resp)
         elif choice == '4':
             resp.say('You wanted to send a text messege.')
             print(choice)
@@ -189,18 +188,60 @@ def pizza():
     # get zip and city
     zips = request.values['FromZip']
     city = request.values['FromCity']
-    print(zips)
-    print(city)
-    resp.say('Connecting you to a pizzeria near, {}.'.format(city))
-
-    resp.dial('forwarding number')
+    print('Your zip code is {}'.format(zips))
+    pizzaArray = pizzatest.getpizzeria(zips)
+    resp.say('I will be connecting you to {} near, {}.'.format(
+        pizzaArray[0][0], city))
+    # dials the pizzeria
+    resp.dial(pizzaArray[0][1])
     resp.say('Goodbye')
 
     resp.redirect('/voice')
     return str(resp)
-    # USE BEAUTIFUL SOUP TO SCRAPE NUMBERS
-    # https://pizza.dominos.com
-    # OR USE YELP API to search by food and location.......
+
+
+# _____________________________________________________________Handles #2 Weather
+@app.route('/weathering', methods=['GET', 'POST'])
+def weathering():
+    resp = VoiceResponse()
+    # get city and output weather:
+    city = request.values['FromCity']
+    print('User location : {}.'.format(city))
+    resp.say(weathertest.gettingWeather(city))
+    resp.say('If you would like to get the weather of another city , say it now')
+
+    # ask user if they would like to get weather for another city
+    gather = Gather(input='speech', speechTimeout=3, action='/otherweathering')
+    resp.append(gather)
+
+    resp.redirect('/voice')
+    return str(resp)
+
+
+@app.route('/otherweathering', methods=['GET', 'POST'])
+def otherweathering():
+    resp = VoiceResponse()
+    if 'SpeechResult' in request.values:
+        city = request.values['SpeechResult']
+        print('User location : {}.'.format(city))
+        resp.say(weathertest.gettingWeather(city))
+        # redirects to get user info again
+        if weathertest.gettingWeather(city) == 'try to say another city name':
+            resp.redirect('/otherweathering2')
+    resp.redirect('/voice')
+    return str(resp)
+
+# little redirect back to processing user input for city input
+
+
+@app.route('/otherweathering2', methods=['GET', 'POST'])
+def otherweathering2():
+    resp = VoiceResponse()
+    gather = Gather(input='speech', speechTimeout=3, action='/otherweathering')
+    resp.append(gather)
+    # if no input, go back to main menu
+    resp.redirect('/voice')
+    return str(resp)
 
 
 # _____________________________________________________________
