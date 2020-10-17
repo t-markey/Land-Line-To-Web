@@ -8,6 +8,10 @@ A fun & useful information line for those without access to the internet
 * Be connected to the highest rated and currently open local pizzeria
 * Input a phone number and say a text message to be sent
 
+## Examples
+[Link To Video Example](https://twitter.com/tommarkey5/status/1317531049820303361)
+![gif](/luckylandline/examples/landline2web.gif)
+
 
 ## Installation
 
