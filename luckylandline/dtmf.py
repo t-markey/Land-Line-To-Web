@@ -72,15 +72,14 @@ def gather():
 @app.route('/texting', methods=['GET', 'POST'])
 def texting():
     global choice
-    print('wierd')
+    print('Setting up sms')
     print(choice)
     resp = VoiceResponse()
     # get input
     with resp.gather(numDigits=10, timeout='6', action='/storing') as gather:
         gather.say('Input the number you wish to text')
-        print('wierd')
         print(choice)
-    # all the shit in this function gets run before the input....?
+    # all  this function gets run before the input....?
     resp.redirect('/voice')
     return str(resp)
 
@@ -89,8 +88,7 @@ def texting():
 def storing():
     resp = VoiceResponse()
     global choice
-    print('wierd4')
-    choice = 333333
+    print('Getting phone number to text to')
     print(choice)
     if 'Digits' in request.values:
         choice = request.values['Digits']
@@ -112,6 +110,7 @@ def speeching():
     gather = Gather(input='speech', timeout=3,
                     hints='yes, no', action='/texting2')
     resp.append(gather)
+
     resp.redirect('/voice')
     return str(resp)
 
@@ -130,7 +129,7 @@ def texting2():
         body=infoo,
         from_=from_,
         to=finishedNumber)
-    resp.say('Your Text message has been sent')
+    resp.say('This Text message has been sent: ', infoo)
     resp.redirect('/voice')
     return str(resp)
 # _____________________________________________________________Handles #1 wiki info
@@ -143,8 +142,9 @@ def infoing():
     resp = VoiceResponse()
     resp.say('Say a topic you would like to learn about')
     # This sends speech to inforouting 2 to be sorted out
-    gather = Gather(input='speech', speechTimeout=1,
+    gather = Gather(input='dtmf speech', speechTimeout=1,
                     hints='yes, no', action='/infoing2')
+
     resp.append(gather)
     resp.say('I didnt quite get that')
     resp.redirect('/infoing')
@@ -169,12 +169,13 @@ def infoing2():
             print('p2:', p)
 
         cut = p
-        interupt = -1
         # checks to make sure summary is not bigger than 3000 char limit
         # Fix - MAKE IT SOIGNE SPLIT THE SUMMARY INTO TWO SAYS TO USE WHOLE SUMMARY
 
         if len(cut) > 3000:
+
             resp.say(cut[0:2800])
+
         else:
             resp.say(cut)
 
@@ -196,9 +197,9 @@ def pizza():
     print('Your zip code is {}'.format(zips))
     pizzaArray = pizzatest.getpizzeria(zips)
     resp.say('I will be connecting you to {} near, {}.'.format(
-        pizzaArray[0][0], city))
-    # dials the pizzeria
-    resp.dial(pizzaArray[0][1])
+        pizzaArray[1][0], city))
+    # dials the pizzeria 2nd best according to yelp in area
+    resp.dial(pizzaArray[1][1])
     resp.say('Goodbye')
 
     resp.redirect('/voice')
