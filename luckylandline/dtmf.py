@@ -47,12 +47,16 @@ def gather():
             resp.say('You requested a Weather forcast.')
             resp.redirect('/weathering')
         elif choice == '3':
-            resp.say('You must be hungry.')
+            resp.say('You must be hungry. Me too actually')
             resp.redirect('/pizza')
         elif choice == '4':
             resp.say('You wanted to send a text messege.')
             print(choice)
             resp.redirect('/texting')
+        elif choice == '0':
+            resp.say(
+                "Help , I'm being held captive in an Automated call center in the year 1984")
+            resp.redirect('/voice')
         else:
             # If the caller didn't choose 1 or 2, apologize and ask them again
             resp.say("Sorry, Choose one of the other available options")
@@ -165,9 +169,10 @@ def infoing2():
             print('p2:', p)
 
         cut = p
-
+        interupt = -1
         # checks to make sure summary is not bigger than 3000 char limit
-        # MAKE IT SOIGNE SPLIT THE SUMMARY INTO TWO SAYS TO USE WHOLE SUMMARY
+        # Fix - MAKE IT SOIGNE SPLIT THE SUMMARY INTO TWO SAYS TO USE WHOLE SUMMARY
+
         if len(cut) > 3000:
             resp.say(cut[0:2800])
         else:
